@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e .
+      - name: Python tests
+        run: python -m unittest discover -s tests
+      - name: Compile
+        run: python -m compileall src
+      - name: Shell syntax
+        run: bash -n scripts/*.sh
+      - name: Secret scan examples
+        run: |
+          warp-vps-kit redact README.md --check
+          warp-vps-kit redact examples/config.example.yaml --check
+          warp-vps-kit redact docs/security.md --check

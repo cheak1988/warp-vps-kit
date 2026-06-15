@@ -1,0 +1,4 @@
+display_name: "Warp VPS Kit"
+short_description: "低成本 VPS 复活与加速：Cloudflare CDN + WARP + Xray 配置生成和诊断工具"
+default_prompt: "帮我用 warp-vps-kit 检查并生成 Cloudflare CDN + WARP 的自托管 VPS 配置"
+

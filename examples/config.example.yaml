@@ -1,0 +1,18 @@
+# Copy to config.yaml and replace the placeholders.
+domain: example.com
+proxy_subdomain: ws
+config_subdomain: cfg
+vps_host: 1.2.3.4
+vless_uuid: VLESS_UUID_HERE
+ws_path: /ws
+client_name: MyVPS
+
+# Optional: leave empty to use ws.example.com as the client server.
+# Advanced users can pin a Cloudflare edge IP here.
+client_server:
+
+xray_inbound_port: 80
+warp_socks_host: 127.0.0.1
+warp_socks_port: 40000
+allow_insecure: true
+
