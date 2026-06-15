@@ -24,6 +24,11 @@ classifiers = [
   "Topic :: Utilities",
 ]
 
+[project.urls]
+Homepage = "https://github.com/cheak1988/warp-vps-kit"
+Issues = "https://github.com/cheak1988/warp-vps-kit/issues"
+Changelog = "https://github.com/cheak1988/warp-vps-kit/blob/main/CHANGELOG.md"
+
 [project.scripts]
 warp-vps-kit = "warp_vps_kit.cli:main"
 

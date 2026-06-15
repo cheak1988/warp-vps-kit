@@ -3,7 +3,7 @@
 > 一台便宜 VPS 直连废了，不一定真的废了。  
 > 只要 Cloudflare 还能回源，就可以把它改造成 **Cloudflare CDN 入口 + WARP 出口加速** 的自托管网络网关。
 
-[![CI](https://img.shields.io/badge/CI-ready-brightgreen.svg)](.github/workflows/ci.yml)
+[![CI](https://github.com/cheak1988/warp-vps-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/cheak1988/warp-vps-kit/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## 一句话
