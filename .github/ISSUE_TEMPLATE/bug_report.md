@@ -20,8 +20,7 @@ labels: bug
 请先脱敏：
 
 ```bash
-warp-vps-kit redact your-log.txt --check
+python vps-proxy-deploy/scripts/redact.py your-log.txt --check
 ```
 
 ## 你已经尝试过什么
-

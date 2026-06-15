@@ -17,8 +17,3 @@ warp-cli --accept-tos status || true
 curl -s --max-time 8 --socks5 127.0.0.1:40000 https://ifconfig.me || true
 echo
 
-echo
-echo "== origin =="
-curl -s --max-time 8 https://ifconfig.me || true
-echo
-

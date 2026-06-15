@@ -3,14 +3,15 @@
 ## Test
 
 ```bash
-python -m unittest discover -s tests
-python -m compileall src
-bash -n scripts/*.sh
+python -m compileall vps-proxy-deploy/scripts
+bash -n vps-proxy-deploy/scripts/*.sh
+python vps-proxy-deploy/scripts/render_config.py --init config.yaml
+python vps-proxy-deploy/scripts/render_config.py --config config.yaml --out out
+python vps-proxy-deploy/scripts/doctor.py --config config.yaml
 ```
 
 ## Checklist
 
 - [ ] No real IPs, UUIDs, tokens, or passwords are included.
-- [ ] README or docs updated if behavior changed.
+- [ ] `vps-proxy-deploy/SKILL.md` or references updated if behavior changed.
 - [ ] Tests added or updated.
-

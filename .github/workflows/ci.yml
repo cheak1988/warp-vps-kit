@@ -5,24 +5,42 @@ on:
   pull_request:
 
 jobs:
-  test:
+  validate-skill:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install
-        run: pip install -e .
-      - name: Python tests
-        run: python -m unittest discover -s tests
-      - name: Compile
-        run: python -m compileall src
-      - name: Shell syntax
-        run: bash -n scripts/*.sh
-      - name: Secret scan examples
+      - name: Validate skill shape
         run: |
-          warp-vps-kit redact README.md --check
-          warp-vps-kit redact examples/config.example.yaml --check
-          warp-vps-kit redact docs/security.md --check
-          warp-vps-kit redact docs/social-posts.md --check
+          test -f vps-proxy-deploy/SKILL.md
+          test -f vps-proxy-deploy/agents/openai.yaml
+          python - <<'PY'
+          from pathlib import Path
+          text = Path("vps-proxy-deploy/SKILL.md").read_text(encoding="utf-8")
+          assert text.startswith("---\n"), "SKILL.md must start with YAML frontmatter"
+          head = text.split("---", 2)[1]
+          assert "name: vps-proxy-deploy" in head
+          assert "description:" in head
+          assert "Cloudflare" in head and "WARP" in head and "Xray" in head
+          PY
+      - name: Python syntax
+        run: python -m compileall vps-proxy-deploy/scripts
+      - name: Shell syntax
+        run: bash -n vps-proxy-deploy/scripts/*.sh
+      - name: Smoke test render and doctor
+        run: |
+          python vps-proxy-deploy/scripts/render_config.py --init config.yaml
+          python vps-proxy-deploy/scripts/render_config.py --config config.yaml --out out
+          test -f out/xray-config.json
+          test -f out/worker.js
+          test -f out/clash-verge.yaml
+          test -f out/v2rayn-link.txt
+          python vps-proxy-deploy/scripts/doctor.py --config config.yaml
+      - name: Secret scan public docs
+        run: |
+          python vps-proxy-deploy/scripts/redact.py README.md --check
+          python vps-proxy-deploy/scripts/redact.py vps-proxy-deploy/SKILL.md --check
+          python vps-proxy-deploy/scripts/redact.py vps-proxy-deploy/references/security.md --check
+          python vps-proxy-deploy/scripts/redact.py vps-proxy-deploy/references/social-posts.md --check

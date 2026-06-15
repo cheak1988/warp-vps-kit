@@ -1,0 +1,4 @@
+display_name: "VPS Proxy Deploy"
+short_description: "让 AI 引导你用 Cloudflare CDN + WARP 复活和加速低价 VPS"
+default_prompt: "帮我检查并部署 Cloudflare CDN + WARP + Xray 的低价 VPS 复活方案"
+

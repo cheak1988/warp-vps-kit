@@ -1,49 +1,22 @@
 # Contributing
 
-欢迎贡献。这个项目的目标不是堆协议，而是把“低价 VPS 复活与加速”这件事做得可复现、可诊断、可维护。
+This is a skill-first repository. Keep the `vps-proxy-deploy/` folder useful when copied by itself into a Codex skills directory.
 
-## 什么贡献最有价值
+## Rules
 
-- 不同 VPS 机房、运营商、地区的 benchmark。
-- Cloudflare 525、DNS、WARP、WebSocket、客户端配置失败案例。
-- 更安全的默认配置。
-- 更清楚的中文文档和截图。
-- 不依赖真实账号的自动化测试。
+- Put core agent instructions in `vps-proxy-deploy/SKILL.md`.
+- Put long docs in `vps-proxy-deploy/references/`.
+- Put deterministic helpers in `vps-proxy-deploy/scripts/`.
+- Do not make the root README the main source of operational knowledge.
+- Do not commit real IPs, UUIDs, tokens, passwords, or raw private logs.
 
-## 提交前检查
-
-```bash
-python -m unittest discover -s tests
-python -m compileall src tests
-warp-vps-kit redact README.md --check
-warp-vps-kit redact examples/config.example.yaml --check
-```
-
-如果你在 Linux/macOS 或 GitHub Actions 中：
+## Validate
 
 ```bash
-bash -n scripts/*.sh
+python -m compileall vps-proxy-deploy/scripts
+python vps-proxy-deploy/scripts/render_config.py --init config.yaml
+python vps-proxy-deploy/scripts/render_config.py --config config.yaml --out out
+python vps-proxy-deploy/scripts/doctor.py --config config.yaml
+python vps-proxy-deploy/scripts/redact.py README.md --check
 ```
-
-## 不要提交
-
-- 真实 VPS IP。
-- 真实 UUID。
-- Cloudflare API token。
-- root 密码。
-- 私有域名完整配置。
-- 原始故障日志。
-
-请先用：
-
-```bash
-warp-vps-kit redact your-file.txt --check
-```
-
-## 文案原则
-
-- README 中文优先，英文简版跟进。
-- 避免承诺“永久可用”“保证 4K”“永久免费高速”。
-- 可以写个人实测，但要说明线路和时间会影响结果。
-- 项目定位用“自托管网络网关 / VPS 复活与加速 / Cloudflare CDN + WARP”，不要写成黑盒托管服务。
 

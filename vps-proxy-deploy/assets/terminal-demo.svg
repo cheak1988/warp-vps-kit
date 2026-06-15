@@ -1,14 +1,14 @@
 <svg width="920" height="520" viewBox="0 0 920 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">warp-vps-kit demo</title>
+  <title id="title">vps-proxy-deploy skill demo</title>
   <desc id="desc">A terminal style demo showing Cloudflare CDN ingress, VPS origin, WARP outbound, and generated client configs.</desc>
   <rect width="920" height="520" rx="14" fill="#0B1020"/>
   <rect x="24" y="24" width="872" height="472" rx="10" fill="#111827" stroke="#334155"/>
   <circle cx="52" cy="52" r="7" fill="#EF4444"/>
   <circle cx="76" cy="52" r="7" fill="#F59E0B"/>
   <circle cx="100" cy="52" r="7" fill="#10B981"/>
-  <text x="128" y="58" fill="#CBD5E1" font-size="16" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">warp-vps-kit</text>
+  <text x="128" y="58" fill="#CBD5E1" font-size="16" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vps-proxy-deploy skill</text>
 
-  <text x="52" y="102" fill="#22C55E" font-size="19" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$ warp-vps-kit render --config config.yaml --out out</text>
+  <text x="52" y="102" fill="#22C55E" font-size="19" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$ python scripts/render_config.py --config config.yaml --out out</text>
   <text x="72" y="138" fill="#E5E7EB" font-size="18" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">✓ rendered xray-config.json</text>
   <text x="72" y="170" fill="#E5E7EB" font-size="18" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">✓ rendered worker.js</text>
   <text x="72" y="202" fill="#E5E7EB" font-size="18" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">✓ rendered clash-verge.yaml</text>
@@ -26,10 +26,9 @@
   <text x="286" y="346" fill="#94A3B8" font-size="15" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">recover broken direct access</text>
   <text x="578" y="346" fill="#94A3B8" font-size="15" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">accelerate outbound path</text>
 
-  <text x="82" y="396" fill="#22C55E" font-size="17" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$ warp-vps-kit doctor --config config.yaml</text>
+  <text x="82" y="396" fill="#22C55E" font-size="17" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$ python scripts/doctor.py --config config.yaml</text>
   <text x="82" y="424" fill="#EAB308" font-size="16" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">[WARN] placeholders are still visible</text>
   <text x="430" y="424" fill="#22C55E" font-size="16" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">[OK] basic config shape is valid</text>
 
   <text x="52" y="470" fill="#CBD5E1" font-size="18" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">低成本 VPS 复活与加速：Cloudflare CDN + WARP + Xray</text>
 </svg>
-

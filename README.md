@@ -1,225 +1,122 @@
-# warp-vps-kit
+# vps-proxy-deploy
 
-> 一台便宜 VPS 直连废了，不一定真的废了。  
-> 只要 Cloudflare 还能回源，就可以把它改造成 **Cloudflare CDN 入口 + WARP 出口加速** 的自托管网络网关。
+> 一个让 AI 帮你复活和加速低价 VPS 的 Codex Skill。  
+> 把 `vps-proxy-deploy/` 丢给支持 Skills 的 AI，它会引导你用 Cloudflare CDN + WARP + Xray 把直连不稳定的 VPS 改造成自托管网络网关。
 
-[![CI](https://github.com/cheak1988/warp-vps-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/cheak1988/warp-vps-kit/actions/workflows/ci.yml)
+[![CI](https://github.com/cheak1988/vps-proxy-deploy/actions/workflows/ci.yml/badge.svg)](https://github.com/cheak1988/vps-proxy-deploy/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-![warp-vps-kit terminal demo](assets/terminal-demo.svg)
+![vps-proxy-deploy skill demo](vps-proxy-deploy/assets/terminal-demo.svg)
 
-## 一句话
+## 为什么做成 Skill
 
-`warp-vps-kit` 是一个中文首发的开源工具包：**把一台便宜 VPS 从“直连废了、出口很慢、配置容易错”改造成“Cloudflare CDN 中转入口 + WARP proxy mode 加速出口 + 可诊断配置”的自托管网络网关。**
+这套方案不是一个单命令能解决的问题。用户经常卡在：
 
-## 项目亮点
+- VPS IP 直连被干扰，但机器本身还活着。
+- SSH 抽风，只能用 VPS 服务商 VNC 救援。
+- Cloudflare 橙云、525、回源端口、SSL 模式容易配错。
+- WARP full tunnel 会把入口搞坏，必须用 proxy mode。
+- Clash Verge / V2RayN 的 UUID、path、Host、SNI 任意一个错就失败。
 
-| 你遇到的问题 | 这个项目做什么 |
-| --- | --- |
-| VPS IP 直连被干扰 | 客户端走 Cloudflare CDN，不再直连源站 IP |
-| 便宜 VPS 出口慢 | Xray 出站走 WARP SOCKS5 proxy mode |
-| VNC 里配置容易输错 | 用 Worker 托管 Xray 配置，VPS `curl` 拉取 |
-| Clash/V2RayN 配置细节多 | 自动生成客户端配置和 VLESS 链接 |
-| 失败时不知道错哪 | `doctor` 诊断 DNS、TCP、WebSocket、占位符 |
-| 怕误传敏感信息 | `redact` 扫描 IP、UUID、token、password |
+所以更适合让 AI 按 skill 的流程来问、判断、生成配置、排查问题。脚本只是 skill 的可靠工具，不是主产品。
 
-## 这个项目解决什么问题
-
-很多人买了每年 20-25 美元的低价 VPS，刚开始还能用，过一阵就会遇到：
-
-- VPS IP 直连受阻，SSH 抽风，端口连着连着就不稳定。
-- 节点能连但速度很慢，YouTube、GitHub、Google 体验很差。
-- 买订阅服务不放心，数据和节点都不在自己手里。
-- 网上教程很多，但坑位分散，照着做很容易卡两天。
-
-`warp-vps-kit` 把这些坑整理成一个可复现的工具包：
-
-- 用 **Cloudflare CDN** 做免费入口中转，隐藏 VPS 真实 IP。
-- 用 **Cloudflare WARP proxy mode** 做 VPS 出口加速。
-- 用 **Cloudflare Workers** 托管配置，避免 VNC 复制长 JSON 时出错。
-- 用 **Xray/VLESS/WebSocket** 提供自托管代理服务。
-- 生成 **Clash Verge / V2RayN** 客户端配置。
-- 提供 `doctor` 诊断命令定位 525、DNS、UUID/path、WARP full tunnel 等常见问题。
-
-作者实测：低价 VPS 方案在特定线路下可流畅播放 4K YouTube。实际速度取决于 VPS 机房、运营商、Cloudflare 路由、时间段和配置，不保证每台机器都复现同样结果。
-
-## 架构
+## 核心思路
 
 ```text
-Client
-  -> Cloudflare CDN (ws.example.com:443, orange cloud)
-  -> VPS origin (Xray VLESS+WS on :80)
-  -> WARP SOCKS5 proxy (127.0.0.1:40000)
-  -> Internet
+Client -> Cloudflare CDN -> VPS Xray VLESS+WS -> WARP SOCKS5 -> Internet
 ```
 
-这不是给 VPS IP 真正“解封”。它的核心是：**用户不再直连 VPS IP，而是通过 Cloudflare 边缘节点回源到 VPS**。如果 Cloudflare 仍能连接你的 VPS，那么原来直连不可用的服务就有机会恢复。
+这不是“解封 VPS IP”。它是把用户入口从直连 VPS 改成 Cloudflare CDN 回源。只要 VPS 还活着、Cloudflare 还能回源，原本直连废掉的服务就有机会复活。
 
-## 能救什么，不能救什么
+## 安装方式
 
-适合：
-
-- VPS IP 从本地直连很不稳定，但 VPS 本身还活着。
-- SSH 从本地经常卡住，但 VNC 或国外网络还能进机器。
-- 代理端口直连失败，希望改成 CDN 中转入口。
-- VPS 出口线路慢，希望用 WARP proxy mode 改善出站路径。
-- 想用便宜 VPS 自己掌控节点和配置。
-
-不适合：
-
-- VPS 已被服务商关停、null route 或机器本身故障。
-- Cloudflare 无法回源到你的 VPS。
-- 域名、DNS、Cloudflare 线路本身不可用。
-- VPS 无法安装或连接 WARP。
-- 期待“永久免费、永远高速、永远可用”的托管服务。
-
-更多边界说明见 [FAQ](docs/faq.md)。
-
-## 快速开始
-
-直接从 GitHub 安装 CLI：
+复制这个文件夹到你的 Codex skills 目录：
 
 ```bash
-python -m pip install "git+https://github.com/cheak1988/warp-vps-kit.git"
-warp-vps-kit init --out config.yaml
+vps-proxy-deploy/
+  SKILL.md
+  agents/openai.yaml
+  scripts/
+  references/
+  assets/
 ```
 
-或者克隆仓库本地开发：
+例如：
 
 ```bash
-# clone this repository first, then:
-cd warp-vps-kit
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
-
-warp-vps-kit init --out config.yaml
+git clone https://github.com/cheak1988/vps-proxy-deploy.git
+mkdir -p ~/.codex/skills
+cp -R vps-proxy-deploy/vps-proxy-deploy ~/.codex/skills/
 ```
 
-更多安装方式见 [安装文档](docs/install.md)。
+Windows PowerShell 示例：
 
-30 秒看效果：
-
-```bash
-warp-vps-kit render --config config.yaml --out out
-warp-vps-kit doctor --config config.yaml
+```powershell
+git clone https://github.com/cheak1988/vps-proxy-deploy.git
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.codex\skills"
+Copy-Item -Recurse .\vps-proxy-deploy\vps-proxy-deploy "$env:USERPROFILE\.codex\skills\"
 ```
 
-示例输出：
+之后你可以直接对 AI 说：
 
 ```text
-rendered xray-config.json: out/xray-config.json
-rendered worker.js: out/worker.js
-rendered clash-verge.yaml: out/clash-verge.yaml
-rendered v2rayn-link.txt: out/v2rayn-link.txt
-rendered next-steps.md: out/next-steps.md
-[WARN] config: domain still uses placeholder value: example.com
-[WARN] config: vps_host still uses placeholder value: 1.2.3.4
-[WARN] config: vless_uuid still uses placeholder value: VLESS_UUID_HERE
-[OK] config: basic config shape is valid
-[INFO] network: skipped network checks; pass --network to enable
+用 vps-proxy-deploy skill，帮我把一台低价 VPS 用 Cloudflare CDN + WARP 复活并生成 Clash 配置。
 ```
 
-完整演示见 [CLI Demo](docs/demo.md)。
+## Skill 能做什么
 
-编辑 `config.yaml`：
+- 解释被封/直连不稳 VPS 如何通过 Cloudflare CDN 回源恢复服务。
+- 引导收集必要参数，不要求用户公开密码或 token。
+- 生成 Xray、Cloudflare Worker、Clash Verge、V2RayN 配置。
+- 指导 VPS 端安装 Xray VLESS+WS 和 WARP proxy mode。
+- 诊断 Cloudflare 525、alive=false、DNS、WebSocket、WARP full tunnel 等常见坑。
+- 帮用户在分享日志前脱敏 IP、UUID、token、password。
 
-```yaml
-domain: example.com
-proxy_subdomain: ws
-config_subdomain: cfg
-vps_host: 1.2.3.4
-vless_uuid: VLESS_UUID_HERE
-ws_path: /ws
-client_name: MyVPS
-```
+## 直接使用脚本
 
-生成配置：
+如果不通过 AI，也可以手动调用 skill 里的脚本：
 
 ```bash
-warp-vps-kit render --config config.yaml --out out
+python vps-proxy-deploy/scripts/render_config.py --init config.yaml
+python vps-proxy-deploy/scripts/render_config.py --config config.yaml --out out
+python vps-proxy-deploy/scripts/doctor.py --config config.yaml
+python vps-proxy-deploy/scripts/redact.py your-log.txt --check
 ```
 
-输出目录会包含：
-
-- `out/xray-config.json`：VPS 上的 Xray 配置。
-- `out/worker.js`：Cloudflare Worker 配置托管脚本。
-- `out/clash-verge.yaml`：Clash Verge 配置片段。
-- `out/v2rayn-link.txt`：V2RayN 导入链接。
-- `out/next-steps.md`：部署步骤提醒。
-
-诊断配置：
+VPS 端脚本默认 dry run，必须显式传 `RUN=1` 才会修改系统：
 
 ```bash
-warp-vps-kit doctor --config config.yaml
-warp-vps-kit doctor --config config.yaml --network
+VLESS_UUID=VLESS_UUID_HERE WS_PATH=/ws RUN=1 bash vps-proxy-deploy/scripts/install-xray-ws.sh
+RUN=1 bash vps-proxy-deploy/scripts/install-warp-proxy.sh
 ```
 
-发布前扫描敏感信息：
+## 仓库结构
 
-```bash
-warp-vps-kit redact README.md --check
-warp-vps-kit redact out/xray-config.json --check
+```text
+vps-proxy-deploy/
+  SKILL.md              # 核心 skill 指令
+  agents/openai.yaml    # UI 元数据
+  scripts/              # 配置生成、诊断、脱敏、VPS 安装脚本
+  references/           # 架构、排错、安全、benchmark、客户端配置
+  assets/               # README/传播用资源
 ```
 
-## Cloudflare 设置要点
+## 传播文案
 
-最容易配错的是这里：
+见 [vps-proxy-deploy/references/social-posts.md](vps-proxy-deploy/references/social-posts.md)。
 
-- `ws.example.com` 指向 VPS IP，必须开启 **Proxied / orange cloud**。
-- Cloudflare 到 VPS 的回源端口用 `80`，Xray 监听 `80`。
-- 该方案默认用 Flexible/HTTP 回源思路，客户端到 Cloudflare 仍是 TLS。
-- Worker 只用于托管配置，避免在 VNC 里手敲长 JSON。
+一句话版本：
 
-如果 `ws.example.com` 是灰云 DNS-only，客户端仍可能直连 VPS，CDN 中转和隐藏源站 IP 就不会生效。
-
-## VPS 端脚本
-
-脚本默认是 dry run，不会直接改机器。确认后传 `RUN=1`：
-
-```bash
-VLESS_UUID=VLESS_UUID_HERE WS_PATH=/ws RUN=1 bash scripts/install-xray-ws.sh
-RUN=1 bash scripts/install-warp-proxy.sh
-bash scripts/doctor-vps.sh
+```text
+我做了一个 AI Skill：把低价 VPS 信息丢给 AI，它会引导你用 Cloudflare CDN + WARP + Xray 把直连废掉的 VPS 救回来。
 ```
 
-建议先通过 VPS 服务商 VNC 执行初始化。直连 SSH 不稳定时，不要把排查时间浪费在本地 SSH 客户端上。
+## 边界
 
-## 和普通一键脚本有什么不同
-
-普通一键脚本通常假设 SSH 能稳定连接、VPS IP 能直连、用户能顺利复制配置。这个项目针对的是更狼狈但很常见的情况：
-
-- VPS 还活着，但本地直连已经很差。
-- SSH 不稳定，只能靠 VNC 救援。
-- 配置稍微错一个 UUID/path/Host 就全线失败。
-- Cloudflare/WARP 的模式选错会让入口或出口互相打架。
-
-所以首版选择“工具包 + 教程 + 诊断”，先保证每一步可解释、可验证，再逐步做自动化。
-
-## 安全提醒
-
-- `PermitRootLogin yes` 和 `PasswordAuthentication yes` 只适合救援阶段，完成后应改回密钥登录和非 root 管理。
-- 不要把真实 IP、UUID、Cloudflare token、root 密码提交到 GitHub。
-- Cloudflare API token 请只给最小权限，用完可撤销。
-- 请遵守所在地法律、VPS 服务商条款和 Cloudflare 服务条款。
-
-## 路线图
-
-- [x] 配置生成器：Xray / Worker / Clash Verge / V2RayN。
-- [x] 本地 doctor：占位符、DNS、TCP、WebSocket 基础检查。
-- [x] 敏感信息扫描：IP、UUID、token、password 模式。
-- [x] 中文 FAQ、benchmark 方法、首发文案和社区模板。
-- [x] 首屏 SVG 演示图和多平台传播文案。
-- [ ] Cloudflare API 自动创建 DNS 和 Worker。
-- [ ] 交互式 TUI 安装器。
-- [ ] 多协议模板：Trojan、Reality fallback、Hysteria2 对比。
-- [ ] 英文文档完善。
-
-## 参考资料
-
-- [Cloudflare Workers documentation](https://developers.cloudflare.com/workers/)
-- [Cloudflare WARP documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-devices/warp/)
-- [XTLS/Xray-install](https://github.com/XTLS/Xray-install)
+- 不保证所有 VPS 都能复活。
+- 不保证固定速度或永久可用。
+- 不自动索要或保存 Cloudflare token。
+- 不应该把真实 IP、UUID、root 密码、token 发到公开 issue。
 
 ## License
 

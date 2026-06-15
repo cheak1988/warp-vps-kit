@@ -18,11 +18,9 @@ if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
 fi
 
 if ! command -v apt-get >/dev/null 2>&1; then
-  echo "This script currently supports Debian/Ubuntu systems with apt-get."
+  echo "This script supports Debian/Ubuntu with apt-get."
   exit 1
 fi
-
-echo "Installing Cloudflare WARP and enabling proxy mode on 127.0.0.1:40000"
 
 run apt-get update
 run apt-get install -y curl gpg lsb-release
@@ -34,7 +32,5 @@ run warp-cli --accept-tos registration new
 run warp-cli --accept-tos mode proxy
 run warp-cli --accept-tos connect
 run warp-cli --accept-tos status
-
-echo "Done. Verify with:"
-echo "curl -s --socks5 127.0.0.1:40000 https://ifconfig.me"
+echo "Verify: curl -s --socks5 127.0.0.1:40000 https://ifconfig.me"
 
