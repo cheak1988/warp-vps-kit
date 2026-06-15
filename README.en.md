@@ -26,3 +26,7 @@ warp-vps-kit doctor --config config.yaml
 
 See [README.md](README.md) for the complete Chinese guide.
 
+## FAQ
+
+The short version: this does not unblock an origin IP. It moves client ingress to Cloudflare CDN and uses WARP proxy mode for outbound traffic. If Cloudflare can still reach the VPS origin, a direct-connect-broken VPS may become usable again.
+

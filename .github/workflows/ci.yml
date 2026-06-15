@@ -20,4 +20,8 @@ jobs:
         run: python -m compileall src
       - name: Shell syntax
         run: bash -n scripts/*.sh
-
+      - name: Secret scan examples
+        run: |
+          warp-vps-kit redact README.md --check
+          warp-vps-kit redact examples/config.example.yaml --check
+          warp-vps-kit redact docs/security.md --check

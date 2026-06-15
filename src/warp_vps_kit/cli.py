@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 
 from .config import load_config, write_template
 from .doctor import format_results, run_doctor
@@ -38,35 +39,40 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
-    if args.command == "init":
-        path = write_template(args.out, force=args.force)
-        print(f"created {path}")
-        return 0
-
-    if args.command == "render":
-        config = load_config(args.config)
-        files = render_all(config, args.out)
-        for name, path in files.items():
-            print(f"rendered {name}: {path}")
-        return 0
-
-    if args.command == "doctor":
-        config = load_config(args.config)
-        results = run_doctor(config, network=args.network)
-        print(format_results(results))
-        return 1 if any(item.level == "fail" for item in results) else 0
-
-    if args.command == "redact":
-        changed, redacted = redact_file(args.path, check=args.check)
-        if args.check:
-            if changed:
-                print(redacted)
-                print(f"possible secrets found in {args.path}", file=sys.stderr)
-                return 1
-            print(f"no secrets found in {args.path}")
+    try:
+        if args.command == "init":
+            path = write_template(args.out, force=args.force)
+            print(f"created {path}")
+            print(f"next: edit {path}, then run: warp-vps-kit render --config {path} --out out")
             return 0
-        print(f"redacted {args.path}" if changed else f"no changes: {args.path}")
-        return 0
+
+        if args.command == "render":
+            config = load_config(args.config)
+            files = render_all(config, args.out)
+            for name, path in files.items():
+                print(f"rendered {name}: {path}")
+            print(f"next: read {Path(args.out) / 'next-steps.md'}")
+            return 0
+
+        if args.command == "doctor":
+            config = load_config(args.config)
+            results = run_doctor(config, network=args.network)
+            print(format_results(results))
+            return 1 if any(item.level == "fail" for item in results) else 0
+
+        if args.command == "redact":
+            changed, redacted = redact_file(args.path, check=args.check)
+            if args.check:
+                if changed:
+                    print(redacted)
+                    print(f"possible secrets found in {args.path}", file=sys.stderr)
+                    return 1
+                print(f"no secrets found in {args.path}")
+                return 0
+            print(f"redacted {args.path}" if changed else f"no changes: {args.path}")
+            return 0
+    except (FileExistsError, FileNotFoundError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
 
     return 2
-

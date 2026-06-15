@@ -12,10 +12,20 @@ license = { text = "MIT" }
 authors = [{ name = "warp-vps-kit contributors" }]
 keywords = ["cloudflare", "warp", "vps", "xray", "vless", "websocket", "clash"]
 dependencies = []
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: System Administrators",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Internet :: Proxy Servers",
+  "Topic :: System :: Networking",
+  "Topic :: Utilities",
+]
 
 [project.scripts]
 warp-vps-kit = "warp_vps_kit.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
