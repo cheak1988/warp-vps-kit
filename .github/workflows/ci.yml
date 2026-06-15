@@ -25,3 +25,4 @@ jobs:
           warp-vps-kit redact README.md --check
           warp-vps-kit redact examples/config.example.yaml --check
           warp-vps-kit redact docs/security.md --check
+          warp-vps-kit redact docs/social-posts.md --check

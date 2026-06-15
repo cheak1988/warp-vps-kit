@@ -6,6 +6,8 @@
 [![CI](https://github.com/cheak1988/warp-vps-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/cheak1988/warp-vps-kit/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+![warp-vps-kit terminal demo](assets/terminal-demo.svg)
+
 ## 一句话
 
 `warp-vps-kit` 是一个中文首发的开源工具包：**把一台便宜 VPS 从“直连废了、出口很慢、配置容易错”改造成“Cloudflare CDN 中转入口 + WARP proxy mode 加速出口 + 可诊断配置”的自托管网络网关。**
@@ -75,6 +77,15 @@ Client
 
 ## 快速开始
 
+直接从 GitHub 安装 CLI：
+
+```bash
+python -m pip install "git+https://github.com/cheak1988/warp-vps-kit.git"
+warp-vps-kit init --out config.yaml
+```
+
+或者克隆仓库本地开发：
+
 ```bash
 # clone this repository first, then:
 cd warp-vps-kit
@@ -84,6 +95,8 @@ pip install -e .
 
 warp-vps-kit init --out config.yaml
 ```
+
+更多安装方式见 [安装文档](docs/install.md)。
 
 30 秒看效果：
 
@@ -196,6 +209,7 @@ bash scripts/doctor-vps.sh
 - [x] 本地 doctor：占位符、DNS、TCP、WebSocket 基础检查。
 - [x] 敏感信息扫描：IP、UUID、token、password 模式。
 - [x] 中文 FAQ、benchmark 方法、首发文案和社区模板。
+- [x] 首屏 SVG 演示图和多平台传播文案。
 - [ ] Cloudflare API 自动创建 DNS 和 Worker。
 - [ ] 交互式 TUI 安装器。
 - [ ] 多协议模板：Trojan、Reality fallback、Hysteria2 对比。

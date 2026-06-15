@@ -7,5 +7,5 @@
 - 生成 Xray、Cloudflare Worker、Clash Verge、V2RayN 配置。
 - 新增 VPS 端 Xray/WARP/doctor 脚本。
 - 新增架构、快速开始、安全、故障排查、benchmark、首发文案文档。
+- 新增首屏 SVG demo 和多平台传播文案。
 - 新增 GitHub Actions、issue 模板、PR 模板。
-

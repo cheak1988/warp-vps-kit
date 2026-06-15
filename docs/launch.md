@@ -22,6 +22,8 @@
 我把一台 $20/年的 VPS 用 Cloudflare CDN + WARP 救活了，整理成了开源工具包
 ```
 
+更多平台文案见 [social-posts.md](social-posts.md)。
+
 ## 首发摘要
 
 ```text

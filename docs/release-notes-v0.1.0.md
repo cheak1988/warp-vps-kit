@@ -9,6 +9,7 @@
 - `doctor` 命令检查占位符、DNS、TCP、WebSocket 基础问题。
 - `redact` 命令帮助发布前扫描 IP、UUID、token、password。
 - VPS 端脚本默认 dry run，需要 `RUN=1` 才会执行修改。
+- 首屏 SVG demo、FAQ、benchmark 和多平台传播文案。
 
 ## Known Limits
 
@@ -21,4 +22,3 @@
 ```text
 低成本 VPS 复活与加速：Cloudflare CDN + WARP + Xray 自托管工具包
 ```
-

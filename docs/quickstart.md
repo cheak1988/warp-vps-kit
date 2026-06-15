@@ -7,6 +7,8 @@
 - VPS 服务商 VNC 控制台。
 - 本地 Python 3.9+。
 
+安装方式见 [install.md](install.md)。
+
 ## 2. 生成配置
 
 ```bash
@@ -55,4 +57,3 @@ systemctl restart xray
 warp-vps-kit doctor --config config.yaml --network
 bash scripts/doctor-vps.sh
 ```
-
